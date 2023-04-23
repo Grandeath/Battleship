@@ -1,6 +1,8 @@
 package connection
 
-type client interface {
+type ClientInterface interface {
 	StartGame() error
-	GetBoard() error
+	GetBoard() (BoardResp, error)
+	GetStatus() (statusStruct, error)
+	Fire(coordinates string) (fireStructResp, error)
 }
