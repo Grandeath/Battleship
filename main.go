@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/Grandeath/Battleship/app"
@@ -36,14 +37,15 @@ func main() {
 		if resp == "miss" {
 			yourTurn = false
 		}
-		// err = app.PrintBoard(&newClient)
-		// if err != nil {
-		// 	log.Println(err)
-		// }
-		// err = app.PrintStatus(&newClient)
-		// if err != nil {
-		// 	log.Println(err)
-		// }
+		err = app.PrintBoard(&newClient)
+		if err != nil {
+			log.Println(err)
+		}
+		fmt.Println(resp)
+		err = app.PrintStatus(&newClient)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
 }

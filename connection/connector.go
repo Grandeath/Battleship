@@ -86,7 +86,7 @@ func (c *Client) GetBoard() (BoardResp, error) {
 }
 
 func (c *Client) GetStatus() (statusStruct, error) {
-	connectionString, err := url.JoinPath(c.host, "/api/game")
+	connectionString, err := url.JoinPath(c.host, "/api/game/desc")
 	if err != nil {
 		return statusStruct{}, fmt.Errorf("cannot create request: %w", nil)
 	}

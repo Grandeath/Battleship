@@ -9,6 +9,9 @@ import (
 	gui "github.com/grupawp/warships-lightgui"
 )
 
+var NewBoard = gui.New(
+	gui.NewConfig())
+
 func StartGame(client connection.ClientInterface) error {
 	err := client.StartGame()
 	if err != nil {
@@ -19,16 +22,14 @@ func StartGame(client connection.ClientInterface) error {
 }
 
 func PrintBoard(client connection.ClientInterface) error {
-	newBoard := gui.New(
-		gui.NewConfig())
 
 	gotBoard, err := client.GetBoard()
 	if err != nil {
 		return err
 	}
 
-	newBoard.Import(gotBoard.Board)
-	newBoard.Display()
+	NewBoard.Import(gotBoard.Board)
+	NewBoard.Display()
 
 	return nil
 }
