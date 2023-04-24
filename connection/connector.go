@@ -13,14 +13,14 @@ type BoardResp struct {
 }
 
 type Client struct {
-	client http.Client
-	host   string
-	WpBot  bool
-	token  string
+	client         http.Client
+	host           string
+	token          string
+	StartingHeader StartingStruct
 }
 
-func NewClient(wpBot bool, host string) Client {
-	return Client{client: http.Client{}, WpBot: wpBot, host: host}
+func NewClient(host string) Client {
+	return Client{client: http.Client{}, host: host}
 }
 
 func (c *Client) StartGame() error {
@@ -28,7 +28,7 @@ func (c *Client) StartGame() error {
 	if err != nil {
 		return err
 	}
-	bodyJson, err := json.Marshal(StartingStruct{Wpbot: c.WpBot})
+	bodyJson, err := json.Marshal(c.StartingHeader)
 	if err != nil {
 		return err
 	}
@@ -85,31 +85,31 @@ func (c *Client) GetBoard() (BoardResp, error) {
 	return newBoard, nil
 }
 
-func (c *Client) GetStatus() (statusStruct, error) {
+func (c *Client) GetLongDesc() (DescriptionStruct, error) {
 	connectionString, err := url.JoinPath(c.host, "/api/game/desc")
 	if err != nil {
-		return statusStruct{}, fmt.Errorf("cannot create request: %w", nil)
+		return DescriptionStruct{}, fmt.Errorf("cannot create request: %w", nil)
 	}
 	req, err := http.NewRequest(http.MethodGet, connectionString, http.NoBody)
 	if err != nil {
-		return statusStruct{}, fmt.Errorf("cannot create request: %w", nil)
+		return DescriptionStruct{}, fmt.Errorf("cannot create request: %w", nil)
 	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("X-Auth-Token", c.token)
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return statusStruct{}, err
+		return DescriptionStruct{}, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return statusStruct{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return DescriptionStruct{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
-	newStatus := statusStruct{}
+	newStatus := DescriptionStruct{}
 	err = json.NewDecoder(resp.Body).Decode(&newStatus)
 	if err != nil {
-		return statusStruct{}, err
+		return DescriptionStruct{}, err
 	}
 	return newStatus, nil
 }
@@ -149,4 +149,60 @@ func (c *Client) Fire(coordinates string) (fireStructResp, error) {
 		return fireStructResp{}, err
 	}
 	return newFire, nil
+}
+
+func (c *Client) GetStatus() (StatusStruct, error) {
+	connectionString, err := url.JoinPath(c.host, "/api/game")
+	if err != nil {
+		return StatusStruct{}, fmt.Errorf("cannot create request: %w", nil)
+	}
+	req, err := http.NewRequest(http.MethodGet, connectionString, http.NoBody)
+	if err != nil {
+		return StatusStruct{}, fmt.Errorf("cannot create request: %w", nil)
+	}
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("X-Auth-Token", c.token)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return StatusStruct{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return StatusStruct{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+	newStatus := StatusStruct{}
+	err = json.NewDecoder(resp.Body).Decode(&newStatus)
+	if err != nil {
+		return StatusStruct{}, err
+	}
+	return newStatus, nil
+}
+
+func (c *Client) GetPlayerList() (PlayerListStruct, error) {
+	connectionString, err := url.JoinPath(c.host, "/api/game/list")
+	if err != nil {
+		return PlayerListStruct{}, fmt.Errorf("cannot create request: %w", nil)
+	}
+	req, err := http.NewRequest(http.MethodGet, connectionString, http.NoBody)
+	if err != nil {
+		return PlayerListStruct{}, fmt.Errorf("cannot create request: %w", nil)
+	}
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return PlayerListStruct{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return PlayerListStruct{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+	playerList := PlayerListStruct{}
+	err = json.NewDecoder(resp.Body).Decode(&playerList)
+	if err != nil {
+		return PlayerListStruct{}, err
+	}
+	return playerList, nil
 }

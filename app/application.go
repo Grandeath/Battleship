@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Grandeath/Battleship/connection"
-	gui "github.com/grupawp/warships-lightgui"
+	gui "github.com/grupawp/warships-lightgui/v2"
 )
 
 var NewBoard = gui.New(
@@ -35,7 +35,7 @@ func PrintBoard(client connection.ClientInterface) error {
 }
 
 func PrintStatus(client connection.ClientInterface) error {
-	statusMessage, err := client.GetStatus()
+	statusMessage, err := client.GetLongDesc()
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func PrintStatus(client connection.ClientInterface) error {
 }
 
 func FireBullet(client connection.ClientInterface) (string, error) {
-	fmt.Println("Write coordinated to shot")
+	fmt.Println("Write coordinates to shot")
 
 	var coord string
 
@@ -79,6 +79,36 @@ func FireBullet(client connection.ClientInterface) (string, error) {
 		return "", err
 	}
 
+	state := gui.Miss
+	if resp.Result == "hit" {
+		state = gui.Hit
+	}
+
+	NewBoard.Set(gui.Right, coord, state)
+	NewBoard.Display()
+
 	fmt.Println(resp.Result)
 	return resp.Result, nil
+}
+
+func GetStatus(client connection.ClientInterface) (connection.StatusStruct, error) {
+	return client.GetStatus()
+}
+
+func UpdateMyBoard(client connection.ClientInterface, coords []string) error {
+	for _, coord := range coords {
+		status, err := NewBoard.HitOrMiss(gui.Left, coord)
+		if err != nil {
+			return err
+		}
+		NewBoard.Display()
+		fmt.Println(status)
+		fmt.Println(coord)
+
+	}
+	return nil
+}
+
+func GetPlayerList(client connection.ClientInterface) (connection.PlayerListStruct, error) {
+	return client.GetPlayerList()
 }
