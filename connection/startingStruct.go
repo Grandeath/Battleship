@@ -7,9 +7,7 @@ type StartingStruct struct {
 	Wpbot       bool   `json:"wpBot"`
 }
 
-type PlayerListStruct struct {
-	PlayerStruct []struct {
-		Game_status string `json:"game_status"`
-		Nick        string `json:"nick"`
-	}
+type PlayerListStruct []struct {
+	Game_status string `json:"game_status"`
+	Nick        string `json:"nick"`
 }

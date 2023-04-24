@@ -142,26 +142,29 @@ func choosePlayer() string {
 	if err != nil {
 		log.Println(err)
 	}
-	if len(playerList.PlayerStruct) == 0 {
+	if len(playerList) == 0 {
 		fmt.Println("No enemies to challenge waiting for the oponent")
 		return ""
 	}
-	for index, player := range playerList.PlayerStruct {
+	for index, player := range playerList {
 		fmt.Printf("%d %s - %s \n", index, player.Nick, player.Game_status)
 	}
-	fmt.Println("Choose a player number")
+	fmt.Println("Choose a player number(-1 to wait for opponent)")
 	var chosenPlayer string
 	_, err = fmt.Scanln(&chosenPlayer)
 	if err != nil {
 		log.Println(err)
 	}
 	numPlayer, err := strconv.Atoi(chosenPlayer)
+	if numPlayer == -1 {
+		return ""
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
-	if numPlayer >= len(playerList.PlayerStruct) || numPlayer < 0 {
+	if numPlayer >= len(playerList) || numPlayer < 0 {
 		log.Fatal("num outside the list")
 	}
 
-	return playerList.PlayerStruct[numPlayer].Nick
+	return playerList[numPlayer].Nick
 }
